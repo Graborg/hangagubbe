@@ -11,42 +11,24 @@ defmodule Hangagubbe do
     ""
   end
 
-  def create_start_string(length), do: String.duplicate("_ ", length) |> String.trim()
-
-  def ask_for_secret_word() do
-    IO.gets("What's the secret word?\n")
-    |> String.trim()
-  end
-
-  def clear_input() do
-    IO.puts("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-  end
-
   def guess(progress, secret_word, errors) do
     guessed_letter = next_guess_dialogue(progress, errors)
 
-    new_progress =
-      match_letter_with_secret_word(guessed_letter, secret_word, progress)
-      |> Enum.join(" ")
+    new_progress = match_letter_with_secret_word(guessed_letter, secret_word, progress)
 
-    errors = if new_progress == progress, do: errors <> " " <> guessed_letter, else: errors
-
-    word_completed =
-      String.split(new_progress)
-      |> Enum.join()
-      |> Kernel.==(secret_word)
+    new_errors = if new_progress == progress, do: errors <> " " <> guessed_letter, else: errors
 
     cond do
-      word_completed ->
+      word_completed?(new_progress, secret_word) ->
         clear_input()
         IO.puts("Hurray! '" <> secret_word <> "' is correct!")
 
-      String.length(errors) > 4 ->
+      String.length(new_errors) > 4 ->
         clear_input()
         IO.puts("You lose")
 
       true ->
-        guess(new_progress, secret_word, errors)
+        guess(new_progress, secret_word, new_errors)
     end
   end
 
@@ -59,11 +41,31 @@ defmodule Hangagubbe do
     |> String.trim()
   end
 
+  #### Private methods
+
+  defp create_start_string(length), do: String.duplicate("_ ", length) |> String.trim()
+
+  defp ask_for_secret_word() do
+    IO.gets("What's the secret word?\n")
+    |> String.trim()
+  end
+
+  defp word_completed?(guess, secret_word) do
+    String.split(guess)
+    |> Enum.join()
+    |> Kernel.==(secret_word)
+  end
+
   defp match_letter_with_secret_word(letter, secret_word, current_state) do
     find_indices(secret_word, letter)
     |> Enum.reduce(String.split(current_state), fn i, state ->
       List.replace_at(state, i, letter)
     end)
+    |> Enum.join(" ")
+  end
+
+  defp clear_input() do
+    IO.puts("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
   end
 
   defp find_indices(secret_word, letter),
