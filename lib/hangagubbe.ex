@@ -3,6 +3,7 @@ defmodule Hangagubbe do
     clear_input()
     secret_word = ask_for_secret_word()
     clear_input()
+
     secret_word_length = String.length(secret_word)
     start_string = create_start_string(secret_word_length)
 
@@ -37,10 +38,12 @@ defmodule Hangagubbe do
 
     cond do
       word_completed ->
-        IO.puts("\n\n\n\n\n\n\n\n\n\n\n\nHurray! '" <> secret_word <> "' is correct!")
+        clear_input()
+        IO.puts("Hurray! '" <> secret_word <> "' is correct!")
 
       String.length(errors) > 4 ->
-        IO.puts("\n\n\n\n\n\n\n\n\n\n\n\nYou lose")
+        clear_input()
+        IO.puts("You lose")
 
       true ->
         guess(new_progress, secret_word, errors)
@@ -48,21 +51,22 @@ defmodule Hangagubbe do
   end
 
   def next_guess_dialogue(progress, errors) do
-    IO.puts("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ncurrent progress: " <> progress)
+    clear_input()
+    IO.puts("current progress: " <> progress)
     IO.puts("errors: " <> errors)
 
     IO.gets("\nGuess a letter!!\n")
     |> String.trim()
   end
 
-  def match_letter_with_secret_word(letter, secret_word, current_state) do
+  defp match_letter_with_secret_word(letter, secret_word, current_state) do
     find_indices(secret_word, letter)
     |> Enum.reduce(String.split(current_state), fn i, state ->
       List.replace_at(state, i, letter)
     end)
   end
 
-  def find_indices(secret_word, letter),
+  defp find_indices(secret_word, letter),
     do:
       String.split(secret_word, "", trim: true)
       |> Enum.with_index()
