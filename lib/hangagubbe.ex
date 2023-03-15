@@ -16,16 +16,21 @@ defmodule Hangagubbe do
 
     new_progress = match_letter_with_secret_word(guessed_letter, secret_word, progress)
 
-    new_errors = if new_progress == progress, do: errors <> " " <> guessed_letter, else: errors
+    new_errors =
+      if new_progress == progress do
+        errors <> " " <> guessed_letter
+      else
+        errors
+      end
 
     cond do
       word_completed?(new_progress, secret_word) ->
         clear_input()
         IO.puts("Hurray! '" <> secret_word <> "' is correct!")
 
-      String.length(new_errors) > 4 ->
+      String.length(new_errors) > 7 ->
         clear_input()
-        IO.puts("You lose")
+        IO.puts("You lose :-(")
 
       true ->
         guess(new_progress, secret_word, new_errors)
